@@ -4,9 +4,7 @@ from collections import defaultdict
 from typing import Dict, List, Optional, Any
 
 try:
-    from room_base import RoomBase
-except ImportError:
-    from .room_base import RoomBase
+    from ..room_base import RoomBase
 
 
 class MultitaskRoom(RoomBase):

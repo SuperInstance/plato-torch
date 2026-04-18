@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plato-torch"
+version = "0.5.0a1"
+description = "PLATO self-training rooms — 21 AI training methods as grab-and-go rooms"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Oracle1", email = "fleet@cocapn.ai"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = ["plato", "training", "rooms", "ai", "ml", "rl", "agents"]
+
+[project.urls]
+Homepage = "https://github.com/SuperInstance/plato-torch"
+Documentation = "https://github.com/SuperInstance/plato-torch#readme"
+Repository = "https://github.com/SuperInstance/plato-torch"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.md"]

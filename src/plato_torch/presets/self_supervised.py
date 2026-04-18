@@ -3,12 +3,7 @@
 import json
 import random
 import math
-try:
-    from room_base import RoomBase
-except ImportError:
-    from .room_base import RoomBase
-
-
+from ..room_base import RoomBase
 class SelfSupervisedRoom(RoomBase):
     """Learns representations by masking input dimensions and predicting them."""
 

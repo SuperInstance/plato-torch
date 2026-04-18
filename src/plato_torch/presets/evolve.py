@@ -13,9 +13,7 @@ from typing import Dict, List, Optional, Any, Tuple
 from collections import defaultdict
 
 try:
-    from room_base import RoomBase
-except ImportError:
-    from .room_base import RoomBase
+    from ..room_base import RoomBase
 
 
 class Genome:
