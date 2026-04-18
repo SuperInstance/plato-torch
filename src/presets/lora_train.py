@@ -8,8 +8,8 @@ from room_base import RoomBase
 class LoRARoom(RoomBase):
     """Simulates LoRA-style adapter training over a base knowledge table."""
 
-    def __init__(self, name: str = "lora", rank: int = 8, alpha: float = 1.0):
-        super().__init__(name=name)
+    def __init__(self, room_id: str = "lora", rank: int = 8, alpha: float = 1.0, **kwargs):
+        super().__init__(room_id=room_id)
         self.rank = rank
         self.alpha = alpha
         self.base_knowledge: dict[str, list[float]] = {}
@@ -63,7 +63,7 @@ class LoRARoom(RoomBase):
         """Return JSON string of the adapter weights (delta table)."""
         serialisable = {k: dict(v) for k, v in self.delta_table.items()}
         payload = {
-            "adapter_name": self.name,
+            "adapter_name": self.room_id,
             "rank": self.rank,
             "alpha": self.alpha,
             "train_step": self._step,

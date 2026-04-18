@@ -1,54 +1,77 @@
-"""FederateRoom — federated averaging across multiple agents."""
+"""FederateRoom — federated averaging across multiple agents. Pure Python, no numpy."""
 
-import json
-import numpy as np
+import json, hashlib
 from collections import defaultdict
-from room_base import RoomBase
+from typing import Dict, List, Optional, Any
+
+try:
+    from room_base import RoomBase
+except ImportError:
+    from ..room_base import RoomBase
 
 
 class FederateRoom(RoomBase):
     """Aggregates learning across agents via federated averaging."""
 
-    def __init__(self, model_dim=64):
-        super().__init__()
-        self.model_dim = model_dim
-        self.aggregated = np.zeros(model_dim, dtype=np.float32)
-        self.agent_updates = defaultdict(list)  # agent_id -> [update, ...]
+    def __init__(self, room_id: str, **kwargs):
+        super().__init__(room_id, preset="federate", **kwargs)
+        self._agent_models = {}        # agent_id → {state_hash → {action → score}}
+        self._consensus = defaultdict(lambda: defaultdict(float))  # merged model
         self.round_num = 0
 
-    def feed(self, data):
-        """Accept dict with agent_id and gradients_or_updates (array-like)."""
-        agent_id = data["agent_id"]
-        updates = np.asarray(data["gradients_or_updates"], dtype=np.float32)
-        self.agent_updates[agent_id].append(updates)
+    def feed(self, data: Any, **kwargs) -> Dict:
+        if isinstance(data, dict):
+            agent_id = data.get("agent_id", "unknown")
+            updates = data.get("updates", {})
+            if agent_id not in self._agent_models:
+                self._agent_models[agent_id] = {}
+            self._agent_models[agent_id].update(updates)
+            return {"agent": agent_id, "updates_received": len(updates)}
+        return {"status": "invalid"}
 
-    def train_step(self):
-        """Federated averaging: mean of per-agent averaged updates."""
-        if not self.agent_updates:
-            return
+    def local_update(self, agent_id: str, gradients: Dict) -> Dict:
+        """Accept gradient-like updates from an agent."""
+        if agent_id not in self._agent_models:
+            self._agent_models[agent_id] = {}
+        for key, value in gradients.items():
+            self._agent_models[agent_id][key] = self._agent_models[agent_id].get(key, 0) + value
+        return {"agent": agent_id, "accepted": True}
 
-        per_agent_means = []
-        for agent_id, updates_list in self.agent_updates.items():
-            mean_update = np.mean(updates_list, axis=0)
-            per_agent_means.append(mean_update)
+    def train_step(self, batch: List[Dict]) -> Dict:
+        """Federated averaging: merge all agent models into consensus."""
+        # Also process any batch tiles
+        for tile in batch:
+            sh = tile.get("state_hash", "")
+            action = tile.get("action", "")
+            reward = tile.get("reward", 0)
+            self._consensus[f"{sh}:{action}"] = self._consensus[f"{sh}:{action}"] * 0.9 + reward * 0.1
 
-        # Federated average across agents
-        fed_avg = np.mean(per_agent_means, axis=0)
-        self.aggregated = self.aggregated + fed_avg
-        self.agent_updates.clear()
+        # Average agent models
+        if self._agent_models:
+            all_keys = set()
+            for model in self._agent_models.values():
+                all_keys.update(model.keys())
+            
+            for key in all_keys:
+                values = [m.get(key, 0) for m in self._agent_models.values()]
+                avg = sum(values) / len(values)
+                self._consensus[key] = avg
+
         self.round_num += 1
+        return {"round": self.round_num, "agents": len(self._agent_models),
+                "consensus_keys": len(self._consensus)}
 
-    def predict(self, x=None):
-        """Return consensus prediction (aggregated model applied to x, or raw model)."""
-        if x is not None:
-            x = np.asarray(x, dtype=np.float32)
-            return float(x @ self.aggregated[: len(x)])
-        return self.aggregated.tolist()
+    def predict(self, input: Any) -> Dict:
+        """Consensus prediction."""
+        key = str(input)
+        value = self._consensus.get(key, 0)
+        # Find nearby keys
+        nearby = {k: round(v, 3) for k, v in self._consensus.items() if key in k}
+        return {"consensus_value": round(value, 3), "nearby": nearby,
+                "agents": len(self._agent_models), "round": self.round_num}
 
-    def export_model(self):
-        """Export aggregated model as JSON."""
-        return json.dumps({
-            "aggregated": self.aggregated.tolist(),
-            "model_dim": self.model_dim,
-            "round_num": self.round_num,
-        }, indent=2)
+    def export_model(self, format: str = "json") -> Optional[bytes]:
+        model = {"room_id": self.room_id, "preset": "federate",
+                 "round": self.round_num, "agents": list(self._agent_models.keys()),
+                 "consensus_size": len(self._consensus)}
+        return json.dumps(model, indent=2).encode()

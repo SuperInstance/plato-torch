@@ -1,89 +1,88 @@
-"""MetaLearnRoom — learns fast-adaptation profiles per task."""
+"""MetaLearnRoom — learns fast-adaptation profiles per task. Pure Python, no numpy."""
 
-import json
-import numpy as np
+import json, math, hashlib
 from collections import defaultdict
-from room_base import RoomBase
+from typing import Dict, List, Optional, Any
+
+try:
+    from room_base import RoomBase
+except ImportError:
+    from ..room_base import RoomBase
 
 
 class MetaLearnRoom(RoomBase):
-    """Meta-learning room that adapts to new tasks via nearest-task lookup."""
+    """Meta-learning: adapt to new tasks in 1-3 examples via nearest-task lookup."""
 
-    def __init__(self, input_dim=64, lr=0.01):
-        super().__init__()
-        self.input_dim = input_dim
-        self.lr = lr
-        self.task_profiles = {}  # task_id -> {centroid, weights}
-        self._buffer = defaultdict(list)  # task_id -> [(x, y), ...]
+    def __init__(self, room_id: str, **kwargs):
+        super().__init__(room_id, preset="meta_learn", **kwargs)
+        self._task_centroids = {}   # task → {feature_hash → count}
+        self._task_actions = {}     # task → {state_hash → best_action}
+        self._buffer = defaultdict(list)
 
-    def feed(self, task_id, examples):
-        """Accept task_id + list of (input, label) example pairs."""
-        for x, y in examples:
-            x = np.asarray(x, dtype=np.float32)
-            self._buffer[task_id].append((x, float(y)))
+    def feed(self, data: Any, **kwargs) -> Dict:
+        if isinstance(data, dict):
+            task = data.get("task", "default")
+            return self.observe(data.get("state",""), data.get("action",""), data.get("outcome",""),
+                              context={"task": task})
+        return {"status": "invalid"}
 
-    def _build_profile(self, task_id):
-        """Build a task adaptation profile from buffered examples."""
-        data = self._buffer[task_id]
-        xs = np.array([d[0] for d in data])
-        ys = np.array([d[1] for d in data])
-        centroid = xs.mean(axis=0)
-        # Simple linear weights via normal equation (pseudo-inverse)
-        X = np.column_stack([xs, np.ones(len(xs))])
-        weights = np.linalg.lstsq(X, ys, rcond=None)[0]
-        self.task_profiles[task_id] = {
-            "centroid": centroid,
-            "weights": weights,
-            "count": len(data),
-        }
+    def add_task(self, task: str, examples: List[Dict]):
+        """Add examples for a task."""
+        for ex in examples:
+            self._buffer[task].append(ex)
 
-    def train_step(self):
-        """Build/update fast-adaptation tables for all buffered tasks."""
-        for task_id in list(self._buffer):
-            if len(self._buffer[task_id]) >= 2:
-                self._build_profile(task_id)
-        # Clear buffered data after building
-        self._buffer.clear()
+    def train_step(self, batch: List[Dict]) -> Dict:
+        for tile in batch:
+            task = tile.get("context", {}).get("task", "default")
+            sh = tile.get("state_hash", "")
+            action = tile.get("action", "")
+            reward = tile.get("reward", 0)
 
-    def predict(self, examples):
-        """Adapt to a new task using 1-3 examples via nearest-task lookup.
+            # Update centroid
+            if task not in self._task_centroids:
+                self._task_centroids[task] = defaultdict(int)
+            self._task_centroids[task][sh] += 1
 
-        Args:
-            examples: list of (input,) or (input, label) pairs.
+            # Update best action
+            if task not in self._task_actions:
+                self._task_actions[task] = defaultdict(lambda: defaultdict(list))
+            self._task_actions[task][sh][action].append(reward)
 
-        Returns:
-            Predicted outputs for the input examples.
-        """
-        if not self.task_profiles:
-            return [0.0] * len(examples)
+        return {"status": "trained", "tasks": len(self._task_centroids)}
 
-        xs = [np.asarray(e[0], dtype=np.float32) for e in examples]
-        # Compute query centroid
-        query_centroid = np.mean(xs, axis=0)
+    def _distance(self, query_features: Dict, task: str) -> float:
+        """Cosine-like distance between query and task centroid."""
+        centroid = self._task_centroids.get(task, {})
+        if not centroid:
+            return float('inf')
+        # Jaccard-like overlap
+        shared = set(query_features.keys()) & set(centroid.keys())
+        if not shared:
+            return float('inf')
+        return 1.0 / (len(shared) + 1)  # more overlap = smaller distance
 
-        # Find nearest task by centroid distance
-        best_task = min(
-            self.task_profiles,
-            key=lambda tid: np.linalg.norm(
-                self.task_profiles[tid]["centroid"] - query_centroid
-            ),
-        )
-        weights = self.task_profiles[best_task]["weights"]
+    def predict(self, input: Any) -> Dict:
+        state = str(input)
+        sh = hashlib.md5(state.encode()).hexdigest()[:8]
+        query_features = {sh: 1}
 
-        # Predict using nearest task's weights
-        results = []
-        for x in xs:
-            x_aug = np.append(x, 1.0)
-            results.append(float(x_aug @ weights))
-        return results
+        # Find nearest task
+        if not self._task_centroids:
+            return {"action": None, "task": None, "adapted_in": 0}
 
-    def export_model(self):
-        """Export task adaptation profiles as JSON-serializable dict."""
-        out = {}
-        for tid, prof in self.task_profiles.items():
-            out[tid] = {
-                "centroid": prof["centroid"].tolist(),
-                "weights": prof["weights"].tolist(),
-                "count": prof["count"],
-            }
-        return json.dumps({"task_profiles": out, "input_dim": self.input_dim}, indent=2)
+        best_task = min(self._task_centroids.keys(),
+                       key=lambda t: self._distance(query_features, t))
+
+        # Use that task's knowledge
+        task_data = self._task_actions.get(best_task, {}).get(sh, {})
+        if task_data:
+            best_action = max(task_data, key=lambda a: sum(task_data[a])/len(task_data[a]))
+            return {"action": best_action, "task": best_task, "adapted_in": 1}
+
+        return {"action": None, "task": best_task, "adapted_in": 0}
+
+    def export_model(self, format: str = "json") -> Optional[bytes]:
+        model = {"room_id": self.room_id, "preset": "meta_learn",
+                 "tasks": list(self._task_centroids.keys()),
+                 "centroid_sizes": {t: len(c) for t, c in self._task_centroids.items()}}
+        return json.dumps(model, indent=2).encode()

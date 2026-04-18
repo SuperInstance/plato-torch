@@ -9,8 +9,8 @@ from room_base import RoomBase
 class ContrastiveRoom(RoomBase):
     """Statistical contrastive learner. No torch – just vector math on dicts of floats."""
 
-    def __init__(self, **kw):
-        super().__init__(**kw)
+    def __init__(self, room_id="contrastive", **kw):
+        super().__init__(room_id, **kw)
         self.vectors: dict[str, dict[str, float]] = {}
         self.sim_matrix: dict[str, dict[str, float]] = defaultdict(dict)
         self._triplets: list[dict] = []

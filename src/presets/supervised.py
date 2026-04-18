@@ -9,8 +9,8 @@ from room_base import RoomBase
 class SupervisedRoom(RoomBase):
     """Learns input→label mappings via frequency counting."""
 
-    def __init__(self, name: str = "supervised"):
-        super().__init__(name=name)
+    def __init__(self, room_id: str = "supervised", **kwargs):
+        super().__init__(room_id, **kwargs)
         self._buffer: list[dict] = []
         self.label_map: dict[str, dict[str, int]] = {}  # hash → {label: count}
 

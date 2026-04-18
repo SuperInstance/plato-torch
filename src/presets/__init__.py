@@ -9,6 +9,12 @@ from .imitate import ImitateRoom
 from .neurosymbolic import NeurosymbolicRoom
 from .continual import ContinualRoom
 from .fewshot import FewshotRoom
+from .supervised import SupervisedRoom
+from .contrastive import ContrastiveRoom
+from .self_supervised import SelfSupervisedRoom
+from .lora_train import LoRARoom
+from .meta_learn import MetaLearnRoom
+from .federate import FederateRoom
 
 PRESET_MAP = {
     "reinforce": ReinforceRoom,
@@ -20,4 +26,10 @@ PRESET_MAP = {
     "neurosymbolic": NeurosymbolicRoom,
     "continual": ContinualRoom,
     "fewshot": FewshotRoom,
+    "supervised": SupervisedRoom,
+    "contrastive": ContrastiveRoom,
+    "self_supervised": SelfSupervisedRoom,
+    "lora": LoRARoom,
+    "meta_learn": MetaLearnRoom,
+    "federate": FederateRoom,
 }

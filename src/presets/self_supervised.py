@@ -9,8 +9,8 @@ from room_base import RoomBase
 class SelfSupervisedRoom(RoomBase):
     """Learns representations by masking input dimensions and predicting them."""
 
-    def __init__(self, name: str = "self_supervised", mask_ratio: float = 0.3, lr: float = 0.01):
-        super().__init__(name=name)
+    def __init__(self, room_id: str = "self_supervised", mask_ratio: float = 0.3, lr: float = 0.01, **kwargs):
+        super().__init__(room_id=room_id)
         self.mask_ratio = mask_ratio
         self.lr = lr
         # representation map: dim -> {mean, std, co_occurrence: {other_dim: cov}}
