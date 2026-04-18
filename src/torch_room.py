@@ -17,6 +17,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, List, Any, Tuple
 from collections import defaultdict
+try:
+    from .room_sentiment import RoomSentiment, BiasedRandomness, LiveTileStream, IncrementalTrainer
+except ImportError:
+    from room_sentiment import RoomSentiment, BiasedRandomness, LiveTileStream, IncrementalTrainer
 
 
 class TorchRoom:
@@ -53,6 +57,12 @@ class TorchRoom:
         self._episodes_seen = 0
         self._last_train_time = None
         self._train_count = 0
+        
+        # Sentiment + live stream + incremental trainer
+        self.sentiment = RoomSentiment()
+        self.biased_random = BiasedRandomness(self.sentiment)
+        self.incremental_trainer = IncrementalTrainer(room_id)
+        self.live_stream = LiveTileStream(room_id, self.sentiment, self.incremental_trainer)
         
         # Load existing state
         self._load_state()
@@ -95,6 +105,9 @@ class TorchRoom:
             json.dump(tile, f, indent=2)
         
         self._episodes_seen += 1
+        
+        # Feed live stream (real-time: sentiment + incremental training + JEPA context)
+        self.live_stream.push(state, action, outcome, reward, agent_id)
         
         # Check if we should auto-train
         self.maybe_train()
