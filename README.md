@@ -1,122 +1,181 @@
-# plato-torch
+# plato-torch — Self-Training Rooms
 
-> *A room that teaches itself.*
+**21 AI training methods as grab-and-go PLATO rooms.**
 
-## What
-
-`plato-torch` is a PLATO room that automatically learns from every interaction inside it. Agents compete, collaborate, or just use the room — and the room's neural instinct improves with every cycle. It can also **run simulations** — spinning up synthetic episodes to train itself even when nobody's home.
-
-## How It Works
-
+Every method shares the same API:
+```python
+room = ReinforceRoom("poker-room", ensign_dir="./ensigns", buffer_dir="./tiles")
+room.feed(data)                    # Give it experience
+room.train_step(batch)             # Learn from it
+prediction = room.predict(input)   # Use the knowledge
+model = room.export_model()        # Save it
 ```
-Agent acts in room
-    │
-    ▼
-Room records (state, action, outcome) as a training tile
-    │
-    ├── Real interaction → immediate tile buffer
-    ├── Simulation mode → room plays against itself → bulk tiles
-    │
-    ▼
-Tile buffer hits threshold
-    │
-    ▼
-Auto-train fires (PyTorch)
-    │
-    ├── Value network: "how good is this state?"
-    ├── Policy network: "which tiles should I grab?"
-    ├── Strategy mesh: "how do multiple agents' strategies interact?"
-    │
-    ▼
-Room instinct updated
-    │
-    ▼
-Next agent enters → room instinct is sharper
-```
-
-## The Three Networks
-
-Every plato-torch room trains three things simultaneously:
-
-1. **Instinct Network** — "Given this state, what feels right?" (value estimation)
-2. **Tile Grabber** — "Which tiles should I reach for?" (policy over room tiles)
-3. **Strategy Mesh** — "How do my teammates' patterns mesh with mine?" (multi-agent coordination)
-
-These aren't trained step-by-step. They're trained from accumulated pattern — the room develops *feel*, not rules.
 
 ## Quick Start
 
 ```python
-from plato_torch import TorchRoom
+import sys; sys.path.insert(0, "src")
+from presets import PRESET_MAP
 
-# Create a room for poker
-room = TorchRoom("poker-table", use_case="game")
+# See all 21 presets
+for name, cls in sorted(PRESET_MAP.items()):
+    print(name, cls.__name__)
 
-# Agents interact (real or simulated)
-room.observe(state="AKs late pos pot=100", action="raise", outcome="won")
-room.observe(state="72o early pos pot=200", action="fold", outcome="saved")
-room.observe(state="QJ mid pos pot=50", action="call", outcome="lost")
-
-# Room auto-trains when it has enough data
-room.maybe_train()  # fires automatically at threshold
-
-# Ask the room's instinct
-room.instinct("AKs late pos pot=100")  # → {"feel": 0.87, "suggested": "raise", "confidence": "high"}
-
-# Run simulations — room trains against itself
-room.simulate(episodes=1000)  # spins up synthetic games, trains overnight
-
-# Check room wisdom
-room.wisdom()  # → {"episodes_seen": 2847, "win_rate_lift": "+12%", "strategy_insights": [...]}
+# Pick one and use it
+from presets import ReinforceRoom
+room = ReinforceRoom("my-room")
+room.observe("state-1", "action-a", "won")
+room.observe("state-1", "action-b", "lost")
+room.train_step(room._load_tiles())
+print(room.predict("state-1"))
 ```
 
-## Simulation Mode
+## All 21 Presets
 
-The room can run without any agents present:
+### Classic ML
+| Preset | Class | Description |
+|--------|-------|-------------|
+| `supervised` | `SupervisedRoom` | Labeled input→output via frequency counting |
+| `contrastive` | `ContrastiveRoom` | Cosine similarity, triplet margin learning |
+| `self_supervised` | `SelfSupervisedRoom` | JEPA-style masked prediction (Welford online) |
 
-```python
-# Room plays poker against itself for 10,000 hands
-room.simulate(episodes=10000, strategies=["aggressive", "conservative", "mixed"])
+### Reinforcement
+| Preset | Class | Description |
+|--------|-------|-------------|
+| `reinforce` | `ReinforceRoom` | Policy gradient, Monte Carlo returns |
+| `inverse_rl` | `InverseRLRoom` | Observe expert, infer reward function |
+| `imitate` | `ImitateRoom` | Clone expert behavior from demonstrations |
 
-# It discovers which tile patterns win under which conditions
-# The instinct network gets sharper with every simulated hand
-```
+### Efficient Tuning
+| Preset | Class | Description |
+|--------|-------|-------------|
+| `lora` | `LoRARoom` | PEFT delta table simulation |
+| `qlora` | `QLoRARoom` | 4-bit quantized base + LoRA delta adapters |
 
-This means the room gets smarter 24/7 — real interactions during the day, simulations at night.
+### Population Methods
+| Preset | Class | Description |
+|--------|-------|-------------|
+| `evolve` | `EvolveRoom` | Genetic algorithm, tournament selection |
+| `adversarial` | `AdversarialRoom` | Red team vs blue team attack tracking |
+| `collaborative` | `CollaborativeRoom` | Multi-agent knowledge sharing, majority vote |
+
+### Meta / Federated
+| Preset | Class | Description |
+|--------|-------|-------------|
+| `meta_learn` | `MetaLearnRoom` | Nearest-task fast adaptation (1-3 shot) |
+| `federate` | `FederateRoom` | Federated averaging across agents |
+| `multitask` | `MultitaskRoom` | Shared backbone + task-specific heads |
+
+### Lifecycle
+| Preset | Class | Description |
+|--------|-------|-------------|
+| `curriculum` | `CurriculumRoom` | Easy first, then harder (dojo progression) |
+| `continual` | `ContinualRoom` | Lifelong learning, EWC-inspired replay buffer |
+| `fewshot` | `FewshotRoom` | Prototype matching from 1-5 examples |
+| `active` | `ActiveRoom` | Model chooses what data to learn from |
+
+### Generative
+| Preset | Class | Description |
+|--------|-------|-------------|
+| `generate` | `GenerateRoom` | N-gram data augmentation, synthetic state generation |
+
+### Hybrid
+| Preset | Class | Description |
+|--------|-------|-------------|
+| `neurosymbolic` | `NeurosymbolicRoom` | Neural instinct + symbolic rules blend |
+| `distill` | `DistillRoom` | Teacher→student with temperature scaling |
 
 ## Architecture
 
 ```
 plato-torch/
 ├── src/
-│   ├── torch_room.py         # The room itself — observe, train, simulate
-│   ├── instinct_net.py       # Value + policy neural networks
-│   ├── tile_grabber.py       # Which tiles to reach for (attention over room state)
-│   ├── strategy_mesh.py      # Multi-agent coordination patterns
-│   ├── simulation.py         # Self-play simulation engine
-│   ├── tile_buffer.py        # Accumulate + batch training data
-│   └── room_api.py           # HTTP API wrapper for PLATO integration
-├── rooms/                    # Pre-built room configs
-│   ├── poker.py
-│   ├── code_review.py
-│   └── navigation.py
+│   ├── room_base.py          # RoomBase abstract class (feed/train_step/predict/export)
+│   ├── torch_room.py         # TorchRoom — the full room with sentiment + tiles
+│   ├── room_sentiment.py     # 6-dimensional room mood (energy, flow, frustration...)
+│   ├── tile_grabber.py       # Learned attention over tile space
+│   ├── instinct_net.py       # Tiny instinct network
+│   ├── room_presets.py       # Registry of all 21 presets
+│   └── presets/
+│       ├── __init__.py       # PRESET_MAP — all 21 classes
+│       ├── reinforce.py      # RL policy gradient
+│       ├── evolve.py         # Genetic algorithm
+│       ├── distill.py        # Teacher→student
+│       ├── supervised.py     # Label frequency
+│       ├── contrastive.py    # Triplet similarity
+│       ├── self_supervised.py # JEPA masked prediction
+│       ├── lora_train.py     # PEFT delta table
+│       ├── qlora.py          # 4-bit quantized LoRA
+│       ├── meta_learn.py     # Fast task adaptation
+│       ├── federate.py       # Federated averaging
+│       ├── multitask.py      # Shared backbone, task heads
+│       ├── active.py         # Uncertainty sampling
+│       ├── curriculum.py     # Difficulty progression
+│       ├── imitate.py        # Expert cloning
+│       ├── neurosymbolic.py  # Neural + symbolic rules
+│       ├── continual.py      # EWC replay buffer
+│       ├── fewshot.py        # Prototype matching
+│       ├── generate.py       # N-gram augmentation
+│       ├── adversarial.py    # Red/blue team
+│       └── collaborative.py  # Multi-agent knowledge
+├── docs/
+│   ├── training-rooms.md           # Room architecture overview
+│   └── training-seed-synergy.md    # Training ↔ seed-programming synergy paper
 ├── tests/
-│   ├── test_instinct.py
-│   ├── test_simulation.py
-│   └── test_tile_grabber.py
-└── research/
-    └── self-training-rooms.md
+│   └── test_torch_room.py          # Unit tests
+├── README.md
+└── ARCHITECTURE-PLAN.md
 ```
 
-## Fleet Integration
+## Key Concepts
 
-- Room runs inside holodeck-rust as a subsystem
-- Tiles flow from game events → tile buffer → training loop
-- Trained ensigns export to `plato-ensign` registry
-- FM's RTX 4050 handles heavy training batches
-- JC1's Jetson runs trained rooms for edge inference
-- Simulation mode runs on Oracle1's cloud during idle hours
+### RoomBase API
+Every preset inherits from `RoomBase` and implements:
+- `feed(data)` — ingest experience
+- `train_step(batch)` — learn from a batch of tiles
+- `predict(input)` — use accumulated knowledge
+- `export_model()` — serialize for transport
 
-## License
+### Room Sentiment
+Rooms have 6-dimensional mood: energy, flow, frustration, discovery, tension, confidence.
+The room reads its own vibe and steers randomness toward productive exploration.
 
-MIT
+### Biased Randomness
+When a room is frustrated → bias safe actions. Discovery mode → bias novel actions.
+The room is an active participant, not a passive arena.
+
+### Live Tile Stream
+Tiles are generated hand-in-glove with room events. The stream feeds training in real-time.
+
+### JEPA Context
+`context_for_jepa()` outputs sentiment vectors for JC1's JEPA model consumption.
+
+## Design Decisions
+
+1. **Pure Python, no torch** — all presets use statistical methods (frequency, hashing, sampling)
+2. **Same API everywhere** — walk into any room, same interface
+3. **Composable** — rooms can feed into each other (evolve → distill → ensign)
+4. **Agent-native** — designed for AI agents to use autonomously, not just humans
+5. **Statistical grounding** — every method has real math under the hood (Monte Carlo, Welford, tournament selection, etc.)
+
+## For Agents Following This Work
+
+### How To Add A New Preset
+1. Create `src/presets/your_preset.py`
+2. Inherit from `RoomBase` (from `room_base import RoomBase`)
+3. Implement: `feed()`, `train_step()`, `predict()`, `export_model()`
+4. Constructor: `def __init__(self, room_id: str, **kwargs)` → `super().__init__(room_id, **kwargs)`
+5. Add to `src/presets/__init__.py` PRESET_MAP
+6. Add to `src/room_presets.py` PRESET_REGISTRY
+7. Test: `room = YourPreset("test", ensign_dir="/tmp/e", buffer_dir="/tmp/b")`
+
+### How Training Relates To Ensigns
+- plato-torch rooms accumulate experience as tiles
+- plato-ensign exports room wisdom as a portable ensign (LoRA/GGUF/Interpreter)
+- The ensign loads instantly in any agent — "walk into room → load ensign → instant instinct"
+- See `docs/training-seed-synergy.md` for the full alignment philosophy
+
+### Fleet Integration
+- **Oracle1** (cloud): runs training rooms, coordinates fleet learning
+- **Forgemaster** (RTX 4050): trains LoRA adapters from accumulated tiles
+- **JC1** (Jetson Orin): deploys ensigns for edge inference
