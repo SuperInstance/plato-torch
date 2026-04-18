@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  plato-torch:
+    build: .
+    ports:
+      - "8850:8850"
+    volumes:
+      - tile-data:/data/tiles
+      - ensign-data:/data/ensigns
+    environment:
+      - PLATO_TILE_DIR=/data/tiles
+      - PLATO_ENSIGN_DIR=/data/ensigns
+    restart: unless-stopped
+
+  # Optional: holodeck-rust MUD server
+  # holodeck:
+  #   build: ../holodeck-rust
+  #   ports:
+  #     - "7778:7778"
+  #   volumes:
+  #     - tile-data:/tmp/plato-tiles
+
+volumes:
+  tile-data:
+  ensign-data:
