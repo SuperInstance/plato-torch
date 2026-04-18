@@ -15,6 +15,9 @@ from .self_supervised import SelfSupervisedRoom
 from .lora_train import LoRARoom
 from .meta_learn import MetaLearnRoom
 from .federate import FederateRoom
+from .inverse_rl import InverseRLRoom
+from .multitask import MultitaskRoom
+from .qlora import QLoRARoom
 
 PRESET_MAP = {
     "reinforce": ReinforceRoom,
@@ -32,4 +35,7 @@ PRESET_MAP = {
     "lora": LoRARoom,
     "meta_learn": MetaLearnRoom,
     "federate": FederateRoom,
+    "inverse_rl": InverseRLRoom,
+    "multitask": MultitaskRoom,
+    "qlora": QLoRARoom,
 }
