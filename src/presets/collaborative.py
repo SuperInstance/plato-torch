@@ -6,8 +6,8 @@ from room_base import RoomBase
 class CollaborativeRoom(RoomBase):
     """Merges knowledge dumps from multiple agents, produces consensus."""
 
-    def __init__(self, name: str = "collaborative"):
-        super().__init__(name)
+    def __init__(self, room_id: str = "collaborative", **kwargs):
+        super().__init__(room_id, **kwargs)
         self.knowledge: dict[str, list[dict]] = {}  # agent_id -> dumps
         self.consensus: dict = {}
 
@@ -48,7 +48,7 @@ class CollaborativeRoom(RoomBase):
     def export_model(self) -> str:
         """JSON dump of shared knowledge base."""
         payload = {
-            "name": self.name,
+            "name": self.room_id,
             "agent_count": len(self.knowledge),
             "consensus": self.consensus,
             "raw_knowledge": self.knowledge,

@@ -18,6 +18,9 @@ from .federate import FederateRoom
 from .inverse_rl import InverseRLRoom
 from .multitask import MultitaskRoom
 from .qlora import QLoRARoom
+from .generate import GenerateRoom
+from .adversarial import AdversarialRoom
+from .collaborative import CollaborativeRoom
 
 PRESET_MAP = {
     "reinforce": ReinforceRoom,
@@ -38,4 +41,7 @@ PRESET_MAP = {
     "inverse_rl": InverseRLRoom,
     "multitask": MultitaskRoom,
     "qlora": QLoRARoom,
+    "generate": GenerateRoom,
+    "adversarial": AdversarialRoom,
+    "collaborative": CollaborativeRoom,
 }

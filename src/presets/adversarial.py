@@ -6,8 +6,8 @@ from room_base import RoomBase
 class AdversarialRoom(RoomBase):
     """Tracks attack/defense rounds, computes success rates, surfaces weak inputs."""
 
-    def __init__(self, name: str = "adversarial"):
-        super().__init__(name)
+    def __init__(self, room_id: str = "adversarial", **kwargs):
+        super().__init__(room_id, **kwargs)
         self.rounds: list[dict] = []
         self.attack_success_rate: float = 0.0
 
@@ -46,7 +46,7 @@ class AdversarialRoom(RoomBase):
     def export_model(self) -> str:
         """JSON dump of the full attack/defense log."""
         payload = {
-            "name": self.name,
+            "name": self.room_id,
             "rounds": self.rounds,
             "attack_success_rate": self.attack_success_rate,
         }

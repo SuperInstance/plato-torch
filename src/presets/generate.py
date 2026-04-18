@@ -9,8 +9,8 @@ from room_base import RoomBase
 class GenerateRoom(RoomBase):
     """Learns the distribution of room states and generates realistic synthetic ones."""
 
-    def __init__(self, name: str = "generate", n: int = 2):
-        super().__init__(name)
+    def __init__(self, room_id: str = "generate", n: int = 2, **kwargs):
+        super().__init__(room_id, **kwargs)
         self.n = n
         self._buffer: list[str] = []
         self._ngram_counts: dict[str, Counter] = defaultdict(Counter)
