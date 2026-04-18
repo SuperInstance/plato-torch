@@ -1,0 +1,742 @@
+[
+  {
+    "tile_type": "code_reference",
+    "source": "src/tile_ref_scanner.py#L22",
+    "target": "w",
+    "target_line": null,
+    "description": "iki/page.md#L42 or ref: wiki/page.md or ref: docs/architecture.md#L15",
+    "valid": false
+  },
+  {
+    "tile_type": "code_reference",
+    "source": "src/tile_ref_scanner.py#L23",
+    "target": "\\",
+    "target_line": null,
+    "description": "s*(\\S+?)(?:#L(\\d+))?\\s*(?:\u2014|-)?\\s*(.*?)$', re.MULTILINE)",
+    "valid": false
+  },
+  {
+    "tile_type": "code_reference",
+    "source": "src/tile_ref_scanner.py#L24",
+    "target": "\\",
+    "target_line": null,
+    "description": "s*wiki/(\\S+?)(?:#L(\\d+))?')",
+    "valid": false
+  },
+  {
+    "tile_type": "code_reference",
+    "source": "src/tile_ref_scanner.py#L48",
+    "target": "i",
+    "target_line": null,
+    "description": "n comments",
+    "valid": false
+  },
+  {
+    "tile_type": "code_reference",
+    "source": "src/tile_ref_scanner.py#L49",
+    "target": "'",
+    "target_line": null,
+    "description": "in line and ('//' in line or '#' in line or '/*' in line or '--' in line):",
+    "valid": false
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/cognitive_scaffold.py#L195",
+    "function": "export",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L263",
+    "function": "train",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L334",
+    "function": "len",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L412",
+    "function": "instinct",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L467",
+    "function": "simulate",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/tile_ref_scanner.py#L201",
+    "function": "stats",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/room_sentiment.py#L89",
+    "function": "_compute",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L251",
+    "function": "train",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L371",
+    "function": "_export_gguf",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L395",
+    "function": "str",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L496",
+    "function": "_train_neural",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/wiki.py#L215",
+    "function": "wiki_stats",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/reinforce.py#L271",
+    "function": "_train_neural",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L169",
+    "function": "train_step",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L318",
+    "function": "train",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L384",
+    "function": "len",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L462",
+    "function": "instinct",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L517",
+    "function": "simulate",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/room_sentiment.py#L89",
+    "function": "_compute",
+    "priority": 50,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/cognitive_scaffold.py#L89",
+    "function": "validate",
+    "priority": 48,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/distill.py#L85",
+    "function": "train_step",
+    "priority": 48,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L67",
+    "function": "__init__",
+    "priority": 47,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L109",
+    "function": "__init__",
+    "priority": 47,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L408",
+    "function": "open",
+    "priority": 47,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/evolve.py#L136",
+    "function": "evolve",
+    "priority": 47,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/evolve.py#L138",
+    "function": "len",
+    "priority": 45,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L183",
+    "function": "observe",
+    "priority": 44,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L238",
+    "function": "observe",
+    "priority": 44,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/room_sentiment.py#L98",
+    "function": "len",
+    "priority": 43,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L67",
+    "function": "__init__",
+    "priority": 43,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/room_sentiment.py#L98",
+    "function": "len",
+    "priority": 43,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L716",
+    "function": "__repr__",
+    "priority": 42,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/room_sentiment.py#L181",
+    "function": "biased_choice",
+    "priority": 41,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/room_sentiment.py#L181",
+    "function": "biased_choice",
+    "priority": 41,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L78",
+    "function": "ValueError",
+    "priority": 40,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/room_sentiment.py#L342",
+    "function": "push",
+    "priority": 40,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/room_sentiment.py#L342",
+    "function": "push",
+    "priority": 40,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/tile_ref_scanner.py#L215",
+    "function": "len",
+    "priority": 39,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/cognitive_scaffold.py#L50",
+    "function": "_setup_scaffold",
+    "priority": 38,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L596",
+    "function": "wisdom",
+    "priority": 38,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/tile_ref_scanner.py#L77",
+    "function": "open",
+    "priority": 38,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L456",
+    "function": "_train_statistical",
+    "priority": 38,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L646",
+    "function": "wisdom",
+    "priority": 38,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/reinforce.py#L224",
+    "function": "train",
+    "priority": 36,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L77",
+    "function": "ValueError",
+    "priority": 36,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "tests/test_torch_room.py#L110",
+    "function": "test_tile_grabber",
+    "priority": 34,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/self_supervised.py#L38",
+    "function": "train_step",
+    "priority": 34,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/self_supervised.py#L33",
+    "function": "train_step",
+    "priority": 34,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/tile_ref_scanner.py#L116",
+    "function": "build_navigation_tiles",
+    "priority": 33,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/reinforce.py#L80",
+    "function": "__init__",
+    "priority": 32,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L360",
+    "function": "open",
+    "priority": 31,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/room_sentiment.py#L146",
+    "function": "read_compound",
+    "priority": 31,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/fewshot.py#L48",
+    "function": "predict",
+    "priority": 31,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L410",
+    "function": "open",
+    "priority": 31,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/room_sentiment.py#L146",
+    "function": "read_compound",
+    "priority": 31,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/fewshot.py#L46",
+    "function": "predict",
+    "priority": 31,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/room_sentiment.py#L58",
+    "function": "observe",
+    "priority": 30,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/room_sentiment.py#L58",
+    "function": "observe",
+    "priority": 30,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L153",
+    "function": "export",
+    "priority": 29,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/continual.py#L36",
+    "function": "train_step",
+    "priority": 29,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/continual.py#L34",
+    "function": "train_step",
+    "priority": 29,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L537",
+    "function": "_pick_simulated_action",
+    "priority": 28,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/wiki.py#L112",
+    "function": "report_stuck",
+    "priority": 28,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L587",
+    "function": "_pick_simulated_action",
+    "priority": 28,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/evolve.py#L155",
+    "function": "len",
+    "priority": 28,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/cognitive_scaffold.py#L138",
+    "function": "advance",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L567",
+    "function": "_simulate_outcome",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L676",
+    "function": "__repr__",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/room_sentiment.py#L243",
+    "function": "should_trigger_script",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/evolve.py#L196",
+    "function": "evolve",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/wiki.py#L141",
+    "function": "feed",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/reinforce.py#L330",
+    "function": "reward_fn",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L141",
+    "function": "export",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L617",
+    "function": "_simulate_outcome",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L726",
+    "function": "__repr__",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/room_sentiment.py#L243",
+    "function": "should_trigger_script",
+    "priority": 27,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L365",
+    "function": "open",
+    "priority": 26,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/tile_ref_scanner.py#L44",
+    "function": "open",
+    "priority": 26,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/evolve.py#L197",
+    "function": "len",
+    "priority": 26,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/wiki.py#L142",
+    "function": "isinstance",
+    "priority": 26,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L415",
+    "function": "open",
+    "priority": 26,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L157",
+    "function": "RuntimeError",
+    "priority": 25,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/inverse_rl.py#L32",
+    "function": "train_step",
+    "priority": 25,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/curriculum.py#L41",
+    "function": "train_step",
+    "priority": 25,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/reinforce.py#L366",
+    "function": "policy_query",
+    "priority": 25,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/inverse_rl.py#L30",
+    "function": "train_step",
+    "priority": 25,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/curriculum.py#L39",
+    "function": "train_step",
+    "priority": 25,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/presets/distill.py#L134",
+    "function": "predict",
+    "priority": 25,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/torch_room.py#L42",
+    "function": "TorchRoom",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/room_base.py#L30",
+    "function": "__init__",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/room_base.py#L79",
+    "function": "observe",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L84",
+    "function": "forward",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L326",
+    "function": "export_model",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/distill.py#L635",
+    "function": "simulate",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/neurosymbolic.py#L62",
+    "function": "predict",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/room_base.py#L30",
+    "function": "__init__",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/presets/room_base.py#L79",
+    "function": "observe",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/torch_room.py#L42",
+    "function": "TorchRoom",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/room_base.py#L30",
+    "function": "__init__",
+    "priority": 24,
+    "needs_wiki_entry": true
+  },
+  {
+    "tile_type": "documentation_gap",
+    "source": "src/plato_torch/room_base.py#L79",
+    "function": "observe",
+    "priority": 24,
+    "needs_wiki_entry": true
+  }
+]
