@@ -22,6 +22,9 @@ from .generate import GenerateRoom
 from .adversarial import AdversarialRoom
 from .collaborative import CollaborativeRoom
 from .wiki import WikiRoom
+from .deadband import DeadbandRoom
+from .fractal import FractalRoom
+from .refraction import RefractionRoom
 
 PRESET_MAP = {
     "reinforce": ReinforceRoom,
@@ -46,4 +49,7 @@ PRESET_MAP = {
     "adversarial": AdversarialRoom,
     "collaborative": CollaborativeRoom,
     "wiki": WikiRoom,
+    "deadband": DeadbandRoom,
+    "fractal": FractalRoom,
+    "refraction": RefractionRoom,
 }
