@@ -4,6 +4,9 @@ Cognitive Scaffold — rooms that teach agents how to think.
 Based on JC1's insight: "The room is a cognitive scaffold. It's not passive space.
 It's an active participant in thinking."
 
+ref: wiki/cognitive-scaffold.md — four scaffold types, stage enforcement, shaping prompts
+"""
+
 Three scaffold types:
 - LogicScaffold: teaches causality, rigor, step-by-step reasoning
 - CreativeScaffold: teaches metaphor, association, lateral thinking

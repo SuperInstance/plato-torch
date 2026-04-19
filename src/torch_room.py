@@ -1,6 +1,7 @@
 """
 TorchRoom — a room that teaches itself.
 
+ref: wiki/torch-room.md — observe→train→simulate→instinct pipeline
 A PLATO room backed by PyTorch that:
 1. Observes agent interactions and records them as training data
 2. Automatically trains instinct/policy/strategy networks from accumulated data
