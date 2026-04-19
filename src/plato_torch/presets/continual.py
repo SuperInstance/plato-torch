@@ -14,7 +14,7 @@ except ImportError:
 class ContinualRoom(RoomBase):
     """Lifelong learning. EWC-inspired: protects important weights from catastrophic forgetting."""
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "continual", **kwargs):
         super().__init__(room_id, preset="continual", **kwargs)
         self.ewc_lambda = kwargs.get("ewc_lambda", 0.4)
         self.memory_size = kwargs.get("memory_size", 200)
@@ -67,7 +67,7 @@ class ContinualRoom(RoomBase):
         return {"task": self._current_task, "tasks_learned": len(self._knowledge),
                 "memory_size": len(self._memory_buffer)}
     
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         h = hashlib.md5(str(input).encode()).hexdigest()[:8]
         # Search across all tasks
         for task, states in self._knowledge.items():

@@ -13,7 +13,7 @@ except ImportError:
 class FederateRoom(RoomBase):
     """Aggregates learning across agents via federated averaging."""
 
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "federate", **kwargs):
         super().__init__(room_id, preset="federate", **kwargs)
         self._agent_models = {}        # agent_id → {state_hash → {action → score}}
         self._consensus = defaultdict(lambda: defaultdict(float))  # merged model
@@ -65,7 +65,7 @@ class FederateRoom(RoomBase):
         return {"round": self.round_num, "agents": len(self._agent_models),
                 "consensus_keys": len(self._consensus)}
 
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         """Consensus prediction."""
         key = str(input)
         value = self._consensus.get(key, 0)

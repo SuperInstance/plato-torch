@@ -12,7 +12,7 @@ except ImportError:
 class MultitaskRoom(RoomBase):
     """Train a shared backbone with task-specific heads."""
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "multitask", **kwargs):
         super().__init__(room_id, preset="multitask", **kwargs)
         self._shared = defaultdict(lambda: defaultdict(list))   # shared state patterns
         self._task_heads = defaultdict(lambda: defaultdict(lambda: defaultdict(float)))  # task → state → action → score
@@ -46,7 +46,7 @@ class MultitaskRoom(RoomBase):
         
         return {"tasks": len(self._task_heads), "shared_states": len(self._shared)}
     
-    def predict(self, input: Any, task: str = None) -> Dict:
+    def predict(self, input=None, _dummy=None, _orig= Any, task: str = None) -> Dict:
         h = hashlib.md5(str(input).encode()).hexdigest()[:8]
         
         # Shared prediction (cross-task)

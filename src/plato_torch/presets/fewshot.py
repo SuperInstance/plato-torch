@@ -14,7 +14,7 @@ except ImportError:
 class FewshotRoom(RoomBase):
     """Few-shot/zero-shot: adapt to new tasks from minimal examples using nearest-prototype."""
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "fewshot", **kwargs):
         super().__init__(room_id, preset="fewshot", **kwargs)
         self.n_shots = kwargs.get("n_shots", 5)
         self._prototypes = defaultdict(lambda: defaultdict(list))  # task → label → [features]
@@ -49,7 +49,7 @@ class FewshotRoom(RoomBase):
             self._prototypes[task][label].append(sh)
         return {"status": "trained", "tasks": len(self._prototypes)}
     
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         h = hashlib.md5(str(input).encode()).hexdigest()[:8]
         # Find closest prototype across all tasks
         best_task = None

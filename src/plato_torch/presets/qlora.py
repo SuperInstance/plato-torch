@@ -12,7 +12,7 @@ except ImportError:
 class QLoRARoom(RoomBase):
     """Simulates QLoRA: 4-bit quantized base + LoRA adapters. Statistical fallback."""
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "qlora", **kwargs):
         super().__init__(room_id, preset="qlora", **kwargs)
         self.quantization = kwargs.get("quantization", "4bit")
         self.rank = kwargs.get("rank", 16)
@@ -57,7 +57,7 @@ class QLoRARoom(RoomBase):
             "avg_precision_loss": round(self._precision_loss / max(len(batch), 1), 4),
         }
     
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         h = hashlib.md5(str(input).encode()).hexdigest()[:8]
         
         # Base prediction (quantized frequency)

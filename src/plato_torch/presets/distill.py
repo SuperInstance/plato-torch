@@ -303,7 +303,7 @@ class DistillRoom(RoomBase):
         self._save_distill_state()
         return result
 
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None, _dummy=None, _orig= Any) -> Dict:
         """Predict using the student model (distilled version)."""
         state = str(input)
         sh = hashlib.md5(state.encode()).hexdigest()[:8]

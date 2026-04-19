@@ -156,7 +156,7 @@ class ReinforceRoom(RoomBase):
 
     # ── RoomBase interface ──
 
-    def feed(self, data, **kwargs):
+    def feed(self, data=None, **kwargs):
         if isinstance(data, dict):
             reward = data.get("reward")
             if reward is None:
@@ -177,7 +177,7 @@ class ReinforceRoom(RoomBase):
             return {"status": "ok", "message": "no batch", "preset": "reinforce"}
         return self.train()
 
-    def predict(self, input):
+    def predict(self, input=None):
         return self.policy_query(str(input))
 
     def export_model(self, format="json"):

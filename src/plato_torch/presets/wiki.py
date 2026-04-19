@@ -53,7 +53,7 @@ class WikiRoom(RoomBase):
     The ralph-wiggum pattern: try → stuck → wiki → continue.
     """
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "wiki", **kwargs):
         super().__init__(room_id, preset="wiki", **kwargs)
         self._wiki: Dict[str, WikiEntry] = {}  # topic → entry
         self._schemas: Dict[str, Dict] = {}  # compiled task schemas
@@ -192,7 +192,7 @@ class WikiRoom(RoomBase):
             "completed_tasks": len(self._completed_tasks),
         }
     
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         """Look up wiki knowledge for the given input."""
         result = self.lookup(str(input))
         schema = self.lookup_schema(str(input))

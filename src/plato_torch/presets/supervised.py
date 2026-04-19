@@ -42,7 +42,7 @@ class SupervisedRoom(RoomBase):
         self._buffer.clear()
         return {"pairs_processed": added, "unique_inputs": len(self.label_map)}
 
-    def predict(self, input_value) -> dict:
+    def predict(self, input_value=None) -> dict:
         """Return the most common label for the given input."""
         h = self._hash_input(input_value)
         bucket = self.label_map.get(h)

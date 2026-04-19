@@ -14,7 +14,7 @@ except ImportError:
 class ActiveRoom(RoomBase):
     """Active learning room. Queries for labels on the most uncertain examples."""
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "active", **kwargs):
         super().__init__(room_id, preset="active", **kwargs)
         self.budget = kwargs.get("budget", 100)
         self.query_size = kwargs.get("query_size", 10)
@@ -42,7 +42,7 @@ class ActiveRoom(RoomBase):
                 self._label_counts[h][action] += 1
         return {"status": "trained", "labeled_states": len(self._label_counts)}
     
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         h = self._hash(str(input))
         counts = self._label_counts.get(h, {})
         total = sum(counts.values())

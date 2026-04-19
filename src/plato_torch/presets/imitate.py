@@ -14,7 +14,7 @@ except ImportError:
 class ImitateRoom(RoomBase):
     """Clone expert behavior from demonstrations."""
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "imitate", **kwargs):
         super().__init__(room_id, preset="imitate", **kwargs)
         self._expert_actions = defaultdict(list)  # state_hash → list of (action, reward)
         self._clone_accuracy = defaultdict(float)
@@ -48,7 +48,7 @@ class ImitateRoom(RoomBase):
         # Build clone model: most common expert action per state
         return {"status": "cloned", "states_learned": len(self._expert_actions)}
     
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         h = hashlib.md5(str(input).encode()).hexdigest()[:8]
         actions = self._expert_actions.get(h, [])
         if not actions:

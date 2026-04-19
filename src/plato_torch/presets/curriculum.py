@@ -14,7 +14,7 @@ except ImportError:
 class CurriculumRoom(RoomBase):
     """Curriculum learning room. Trains on easy examples first, progressively harder."""
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "curriculum", **kwargs):
         super().__init__(room_id, preset="curriculum", **kwargs)
         self.stages = kwargs.get("stages", [
             {"difficulty": "easy", "threshold": 0.9},
@@ -68,7 +68,7 @@ class CurriculumRoom(RoomBase):
         return {"stage": self.current_stage, "stages_total": len(self.stages),
                 "stage_name": self.stages[self.current_stage]["difficulty"] if self.current_stage < len(self.stages) else "mastered"}
     
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         h = hashlib.md5(str(input).encode()).hexdigest()[:8]
         # Search current stage first, then easier stages
         for i in range(self.current_stage, -1, -1):

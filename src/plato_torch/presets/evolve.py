@@ -246,7 +246,7 @@ class EvolveRoom(RoomBase):
 
     # ── RoomBase interface ──
 
-    def feed(self, data, **kwargs):
+    def feed(self, data=None, **kwargs):
         if isinstance(data, dict):
             if "genome_id" in data:
                 for g in self.population:
@@ -265,7 +265,7 @@ class EvolveRoom(RoomBase):
         self._assign_fitness_from_tiles(batch)
         return self.evolve(generations=1)
 
-    def predict(self, input):
+    def predict(self, input=None):
         best = self.best_genome()
         if not best: return {"best_genes": {}, "fitness": 0}
         return {"best_genes": best.genes, "fitness": round(best.fitness, 4),

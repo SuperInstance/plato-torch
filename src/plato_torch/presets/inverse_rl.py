@@ -12,7 +12,7 @@ except ImportError:
 class InverseRLRoom(RoomBase):
     """Watch an expert perform, infer what reward function they're optimizing."""
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "inverse_rl", **kwargs):
         super().__init__(room_id, preset="inverse_rl", **kwargs)
         self._expert_states = defaultdict(list)  # state_hash → [actions]
         self._inferred_rewards = defaultdict(lambda: defaultdict(float))  # state → action → reward
@@ -59,7 +59,7 @@ class InverseRLRoom(RoomBase):
         
         return {"status": "inferred", "states_analyzed": len(state_actions)}
     
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         h = hashlib.md5(str(input).encode()).hexdigest()[:8]
         rewards = dict(self._inferred_rewards.get(h, {}))
         if rewards:

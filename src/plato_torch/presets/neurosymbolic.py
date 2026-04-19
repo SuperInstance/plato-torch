@@ -14,7 +14,7 @@ except ImportError:
 class NeurosymbolicRoom(RoomBase):
     """Hybrid: neural pattern recognition + hard symbolic rules."""
     
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "neurosymbolic", **kwargs):
         super().__init__(room_id, preset="neurosymbolic", **kwargs)
         self.neural_weight = kwargs.get("neural_weight", 0.6)
         self.rule_weight = kwargs.get("rule_weight", 0.4)
@@ -63,7 +63,7 @@ class NeurosymbolicRoom(RoomBase):
         scored = {a: sum(rs)/len(rs) for a, rs in actions.items()}
         return max(scored, key=scored.get)
     
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         state = str(input)
         sh = hashlib.md5(state.encode()).hexdigest()[:8]
         

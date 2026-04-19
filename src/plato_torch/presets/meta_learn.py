@@ -13,7 +13,7 @@ except ImportError:
 class MetaLearnRoom(RoomBase):
     """Meta-learning: adapt to new tasks in 1-3 examples via nearest-task lookup."""
 
-    def __init__(self, room_id: str, **kwargs):
+    def __init__(self, room_id: str = "meta_learn", **kwargs):
         super().__init__(room_id, preset="meta_learn", **kwargs)
         self._task_centroids = {}   # task → {feature_hash → count}
         self._task_actions = {}     # task → {state_hash → best_action}
@@ -65,7 +65,7 @@ class MetaLearnRoom(RoomBase):
             return float('inf')
         return 1.0 / (len(shared) + 1)  # more overlap = smaller distance
 
-    def predict(self, input: Any) -> Dict:
+    def predict(self, input=None) -> Dict:
         state = str(input)
         sh = hashlib.md5(state.encode()).hexdigest()[:8]
         query_features = {sh: 1}
