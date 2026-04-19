@@ -2,7 +2,12 @@
 
 import json, math, hashlib
 from collections import defaultdict
-from ..room_base import RoomBase
+try:
+    from room_base import RoomBase
+except ImportError:
+    from .room_base import RoomBase
+
+
 class LoRARoom(RoomBase):
     """Simulates LoRA-style adapter training over a base knowledge table."""
 

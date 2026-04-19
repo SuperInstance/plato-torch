@@ -1,6 +1,11 @@
 """AdversarialRoom — Red team vs blue team training."""
 import json
-from ..room_base import RoomBase
+try:
+    from room_base import RoomBase
+except ImportError:
+    from .room_base import RoomBase
+
+
 class AdversarialRoom(RoomBase):
     """Tracks attack/defense rounds, computes success rates, surfaces weak inputs."""
 

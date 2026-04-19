@@ -3,7 +3,12 @@
 import json
 import math
 from collections import defaultdict
-from ..room_base import RoomBase
+try:
+    from room_base import RoomBase
+except ImportError:
+    from .room_base import RoomBase
+
+
 class ContrastiveRoom(RoomBase):
     """Statistical contrastive learner. No torch – just vector math on dicts of floats."""
 

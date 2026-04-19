@@ -3,7 +3,12 @@
 import json
 import hashlib
 from collections import Counter
-from ..room_base import RoomBase
+try:
+    from room_base import RoomBase
+except ImportError:
+    from .room_base import RoomBase
+
+
 class SupervisedRoom(RoomBase):
     """Learns input→label mappings via frequency counting."""
 

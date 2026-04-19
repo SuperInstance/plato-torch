@@ -1,6 +1,11 @@
 """CollaborativeRoom — Multi-agent knowledge sharing."""
 import json
-from ..room_base import RoomBase
+try:
+    from room_base import RoomBase
+except ImportError:
+    from .room_base import RoomBase
+
+
 class CollaborativeRoom(RoomBase):
     """Merges knowledge dumps from multiple agents, produces consensus."""
 

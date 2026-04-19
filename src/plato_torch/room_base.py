@@ -3,6 +3,8 @@ RoomBase — abstract base class for all training room presets.
 
 Every training method (supervised, reinforce, evolve, etc.) inherits from this.
 Same interface, different training paradigm underneath.
+
+ref: wiki/room-base.md — why pure Python, the API contract, design decisions
 """
 
 import json
@@ -76,7 +78,7 @@ class RoomBase(ABC):
     
     # ── Common interface (shared across all presets) ──
     
-    def observe(self, state: str, action: str, outcome: str,
+    def observe(self, state: str, action: str, outcome: str,  # ref: wiki/room-base.md#L31 — tile recording with reward tracking
                 agent_id: str = "unknown", context: Dict = None,
                 reward: float = None) -> Dict:
         """Record an interaction. Works for all presets."""

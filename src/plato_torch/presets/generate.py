@@ -3,7 +3,12 @@
 import json
 import random
 from collections import Counter, defaultdict
-from ..room_base import RoomBase
+try:
+    from room_base import RoomBase
+except ImportError:
+    from .room_base import RoomBase
+
+
 class GenerateRoom(RoomBase):
     """Learns the distribution of room states and generates realistic synthetic ones."""
 

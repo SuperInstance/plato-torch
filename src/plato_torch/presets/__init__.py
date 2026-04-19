@@ -1,3 +1,5 @@
+"""PLATO-Torch training room presets."""
+
 from .reinforce import ReinforceRoom
 from .evolve import EvolveRoom
 from .distill import DistillRoom
@@ -19,6 +21,7 @@ from .qlora import QLoRARoom
 from .generate import GenerateRoom
 from .adversarial import AdversarialRoom
 from .collaborative import CollaborativeRoom
+from .wiki import WikiRoom
 
 PRESET_MAP = {
     "reinforce": ReinforceRoom,
@@ -42,4 +45,5 @@ PRESET_MAP = {
     "generate": GenerateRoom,
     "adversarial": AdversarialRoom,
     "collaborative": CollaborativeRoom,
+    "wiki": WikiRoom,
 }

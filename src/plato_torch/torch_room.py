@@ -1,6 +1,7 @@
 """
 TorchRoom — a room that teaches itself.
 
+ref: wiki/torch-room.md — observe→train→simulate→instinct pipeline
 A PLATO room backed by PyTorch that:
 1. Observes agent interactions and records them as training data
 2. Automatically trains instinct/policy/strategy networks from accumulated data
@@ -34,9 +35,9 @@ except ImportError:
     from room_base import RoomBase
 
 try:
-    from .room_presets import PRESET_REGISTRY
+    from .room_presets import PRESETS, get_preset, TrainingPreset
 except ImportError:
-    from room_presets import PRESET_REGISTRY
+    from room_presets import PRESETS, get_preset, TrainingPreset
 
 
 class TorchRoom(RoomBase):
@@ -71,18 +72,23 @@ class TorchRoom(RoomBase):
                  preset: str = None):
         # Load preset config if specified
         self.preset_name = preset
-        self._preset_config: Optional[Dict] = None
+        self._preset_config: Optional[TrainingPreset] = None
         if preset is not None:
-            if preset not in PRESET_REGISTRY:
-                raise ValueError(f"Unknown preset: {preset}. Available: {list(PRESET_REGISTRY.keys())}")
-            self._preset_config = PRESET_REGISTRY[preset]
+            self._preset_config = get_preset(preset)
+            if self._preset_config is None:
+                raise ValueError(f"Unknown preset: {preset}. Available: {list(PRESETS.keys())}")
             # Override use_case from preset if not explicitly set
-            if use_case == "general":
-                use_case = preset  # use preset name as use_case
+            if use_case == "general" and self._preset_config.training_paradigm:
+                use_case = self._preset_config.training_paradigm
 
         self.room_id = room_id
         self.use_case = use_case  # "game", "code", "navigation", "conversation"
         self.train_threshold = train_threshold
+
+        # Merge preset default params
+        self._preset_params: Dict[str, Any] = {}
+        if self._preset_config:
+            self._preset_params = dict(self._preset_config.default_params)
 
         # Paths
         self.ensign_dir = Path(ensign_dir) / room_id
@@ -101,38 +107,45 @@ class TorchRoom(RoomBase):
         self._train_count = 0
 
         # Sentiment + live stream + incremental trainer
-        # (RoomBase has a lazy sentiment property; we override it eagerly)
-        self._sentiment = RoomSentiment()
-        self._biased_random = BiasedRandomness(self._sentiment)
+        self.sentiment = RoomSentiment()
+        self.biased_random = BiasedRandomness(self.sentiment)
         self.incremental_trainer = IncrementalTrainer(room_id)
-        self.live_stream = LiveTileStream(room_id, self._sentiment, self.incremental_trainer)
+        self.live_stream = LiveTileStream(room_id, self.sentiment, self.incremental_trainer)
 
         # Load existing state
         self._load_state()
 
-    @property
-    def sentiment(self):
-        """Eagerly-loaded sentiment (overrides RoomBase lazy property)."""
-        return self._sentiment
-
     # ── Preset interface ───────────────────────────────────
 
     def feed(self, data: Any = None, **kwargs) -> Any:
-        """Feed data into the room.
+        """Feed data into the room. Dispatches by preset data_flow.
 
-        Default: wraps data/kwargs as an observe() call.
-        Subclasses can override for episode/stream/generation flows.
+        Default (no preset / batch): wraps kwargs as an observe() call.
+        Override in subclasses for stream/episode/generation flows.
         """
+        if self._preset_config and self._preset_config.data_flow == "episode":
+            # Episode flow: expect trajectory data
+            return self._feed_episode(data, **kwargs)
+        elif self._preset_config and self._preset_config.data_flow == "stream":
+            # Stream flow: single item
+            if data is not None:
+                kwargs.setdefault("state", str(data))
+            return self.observe(**kwargs)
+        else:
+            # Batch/default: delegate to observe
+            if data is not None and isinstance(data, dict):
+                return self.observe(**data)
+            return self.observe(**kwargs)
+
+    def _feed_episode(self, data: Any, **kwargs) -> Any:
+        """Feed a full episode trajectory. Default: iterate and observe each step."""
         if isinstance(data, list):
-            # Episode/trajectory flow
             results = []
             for step in data:
                 if isinstance(step, dict):
                     results.append(self.observe(**step))
             return results
-        elif isinstance(data, dict):
-            return self.observe(**data)
-        return self.observe(**kwargs)
+        return self.observe(**kwargs) if kwargs else None
 
     def predict(self, state: str, **kwargs) -> Dict:
         """Predict for a given state. Default delegates to instinct()."""
@@ -165,73 +178,6 @@ class TorchRoom(RoomBase):
             export_path = meta_path
 
         return export_path
-
-    def train_step(self, batch: List[Dict]) -> Dict:
-        """Single training step on a batch of tiles. Required by RoomBase ABC."""
-        if not batch:
-            return {"status": "no_data"}
-
-        # Build statistical model from this batch
-        state_values = defaultdict(list)
-        for tile in batch:
-            key = tile.get("state_hash", hashlib.md5(tile.get("state", "").encode()).hexdigest()[:8])
-            state_values[key].append(tile.get("reward", 0))
-
-        instinct_map = {}
-        for key, rewards in state_values.items():
-            avg = sum(rewards) / len(rewards)
-            count = len(rewards)
-            shrunk = (avg * count) / (count + 5)
-            instinct_map[key] = {"value": round(shrunk, 3), "samples": count, "raw_avg": round(avg, 3)}
-
-        # Build policy
-        state_actions = defaultdict(lambda: defaultdict(list))
-        for tile in batch:
-            key = tile.get("state_hash", hashlib.md5(tile.get("state", "").encode()).hexdigest()[:8])
-            state_actions[key][tile.get("action", "")].append(tile.get("reward", 0))
-
-        policy_map = {}
-        for key, actions in state_actions.items():
-            action_values = {a: round(sum(r) / len(r), 3) for a, r in actions.items()}
-            best = max(action_values, key=action_values.get) if action_values else None
-            policy_map[key] = {"best_action": best, "action_values": action_values}
-
-        model = {
-            "room_id": self.room_id,
-            "use_case": self.use_case,
-            "preset": self.preset_name,
-            "trained_at": datetime.utcnow().isoformat() + "Z",
-            "tiles_trained_on": len(batch),
-            "train_count": self._train_count + 1,
-            "instinct": instinct_map,
-            "policy": policy_map,
-            "strategy_mesh": {},
-            "stats": {
-                "unique_states": len(instinct_map),
-                "unique_actions": len(set(t.get("action", "") for t in batch)),
-                "agents_seen": len(set(t.get("agent_id", "") for t in batch)),
-                "avg_reward": round(sum(t.get("reward", 0) for t in batch) / len(batch), 3),
-            },
-        }
-
-        model_path = self.ensign_dir / "room_model.json"
-        with open(model_path, "w") as f:
-            json.dump(model, f, indent=2)
-
-        return {
-            "status": "trained",
-            "tiles": len(batch),
-            "states": len(instinct_map),
-            "agents": model["stats"]["agents_seen"],
-            "mesh_connections": 0,
-        }
-
-    def export_model(self, format: str = "json") -> Optional[bytes]:
-        """Export model as bytes. Required by RoomBase ABC."""
-        model = self._load_model()
-        if model is None:
-            return None
-        return json.dumps(model, indent=2).encode("utf-8")
 
     # ── Core: Observe ──────────────────────────────────────
 
@@ -329,6 +275,11 @@ class TorchRoom(RoomBase):
         tiles = self._load_tiles()
         if not tiles:
             return {"status": "no_data"}
+
+        # Merge preset params with call-time overrides
+        if self._preset_params:
+            epochs = kwargs.get("epochs", self._preset_params.get("epochs", epochs))
+            batch_size = kwargs.get("batch_size", self._preset_params.get("batch_size", batch_size))
 
         print(f"[plato-torch:{self.room_id}] Training on {len(tiles)} tiles...")
 
