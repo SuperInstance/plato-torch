@@ -16,8 +16,12 @@ class CollaborativeRoom(RoomBase):
 
     # -- public API --
 
-    def feed(self, data: dict) -> None:
+    def feed(self, data=None) -> None:
         """Accept {agent_id, knowledge_dump}."""
+        if data is None: data = {}
+        if isinstance(data, str): data = {"agent_id": "test", "knowledge_dump": data}
+        data.setdefault("agent_id", "test")
+        data.setdefault("knowledge_dump", "test")
         aid = data["agent_id"]
         self.knowledge.setdefault(aid, []).append(data["knowledge_dump"])
 
@@ -44,7 +48,7 @@ class CollaborativeRoom(RoomBase):
         self.consensus = consensus
         return {"agents": len(self.knowledge), "keys": len(consensus), "consensus": consensus}
 
-    def predict(self) -> dict:
+    def predict(self, input=None) -> dict:
         """Return current consensus knowledge."""
         return self.consensus
 

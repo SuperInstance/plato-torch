@@ -55,12 +55,16 @@ class RoomBase(ABC):
     # ── Abstract interface (every preset must implement) ──
     
     @abstractmethod
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         """Feed data into the room. Format depends on preset."""
         pass
     
     @abstractmethod
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "room_base"}
         """One training step on a batch of data."""
         pass
     

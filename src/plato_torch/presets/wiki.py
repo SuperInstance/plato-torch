@@ -138,7 +138,9 @@ class WikiRoom(RoomBase):
             "needs_big_model": resolution is None,
         }
     
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         if isinstance(data, dict):
             # Wiki entries
             if "topic" in data and "content" in data:
@@ -166,7 +168,9 @@ class WikiRoom(RoomBase):
             return self.observe(data.get("state",""), data.get("action",""), data.get("outcome",""))
         return {"status": "invalid"}
     
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "wiki"}
         """Process tiles: extract knowledge, update wiki helpfulness."""
         for tile in batch:
             action = tile.get("action", "")

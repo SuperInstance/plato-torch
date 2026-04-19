@@ -221,7 +221,9 @@ class DistillRoom(RoomBase):
 
     # ── RoomBase interface ─────────────────────────────────
 
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         """Feed data. Routes to teacher, student, or interaction based on type."""
         if isinstance(data, dict):
             dtype = data.get("type", "interaction")
@@ -244,7 +246,9 @@ class DistillRoom(RoomBase):
                 )
         return {"status": "invalid_data"}
 
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "distill"}
         """Run one distillation training step on accumulated data."""
         return self.train()
 

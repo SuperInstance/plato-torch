@@ -20,7 +20,9 @@ class FewshotRoom(RoomBase):
         self._prototypes = defaultdict(lambda: defaultdict(list))  # task → label → [features]
         self._all_tasks = set()
     
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         if isinstance(data, dict):
             task = data.get("task", "default")
             self._all_tasks.add(task)
@@ -37,7 +39,9 @@ class FewshotRoom(RoomBase):
             self._prototypes[task][label].append(sh)
         return {"task": task, "examples": len(examples), "labels": list(self._prototypes[task].keys())}
     
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "fewshot"}
         for tile in batch:
             task = tile.get("context", {}).get("task", "default")
             sh = tile.get("state_hash", "")

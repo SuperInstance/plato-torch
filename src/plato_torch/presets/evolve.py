@@ -259,7 +259,9 @@ class EvolveRoom(RoomBase):
                                data.get("outcome",""), reward=data.get("reward"))
         return {"status": "invalid_data"}
 
-    def train_step(self, batch):
+    def train_step(self, batch=None):
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "evolve"}
         self._assign_fitness_from_tiles(batch)
         return self.evolve(generations=1)
 

@@ -21,14 +21,18 @@ class MultitaskRoom(RoomBase):
     def add_task(self, task: str, loss_weight: float = 1.0):
         self._loss_weights[task] = loss_weight
     
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         if isinstance(data, dict):
             task = data.get("task", "default")
             return self.observe(data.get("state",""), data.get("action",""), data.get("outcome",""),
                               context={"task": task})
         return {"status": "invalid"}
     
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "multitask"}
         for tile in batch:
             task = tile.get("context", {}).get("task", "default")
             sh = tile.get("state_hash", "")

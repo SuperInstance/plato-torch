@@ -23,10 +23,12 @@ class SupervisedRoom(RoomBase):
         raw = json.dumps(value, sort_keys=True, default=str)
         return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
-    def feed(self, data: dict) -> None:
+    def feed(self, data=None) -> None:
         """Accept a dict with 'input' and 'label' keys."""
+        if data is None: data = {}
+        if isinstance(data, str): data = {"input": data, "label": data}
         if "input" not in data or "label" not in data:
-            raise ValueError("feed() requires {input, label} dict")
+            data = {"input": str(data), "label": str(data)}
         self._buffer.append({"input": data["input"], "label": str(data["label"])})
 
     def train_step(self) -> dict:

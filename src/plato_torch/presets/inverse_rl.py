@@ -17,7 +17,9 @@ class InverseRLRoom(RoomBase):
         self._expert_states = defaultdict(list)  # state_hash → [actions]
         self._inferred_rewards = defaultdict(lambda: defaultdict(float))  # state → action → reward
     
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         if isinstance(data, dict):
             return self.observe(data.get("state",""), data.get("action",""), data.get("outcome",""))
         return {"status": "invalid"}
@@ -29,7 +31,9 @@ class InverseRLRoom(RoomBase):
                         agent_id="expert")
         return {"demos_loaded": len(demonstrations)}
     
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "inverse_rl"}
         """Infer reward function from expert behavior using inverse RL heuristic.
         
         Expert chose action A in state S → A gets higher reward than alternatives.

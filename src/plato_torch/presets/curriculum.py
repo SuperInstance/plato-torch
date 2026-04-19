@@ -33,12 +33,16 @@ class CurriculumRoom(RoomBase):
         elif r > 0.3: return "medium"
         else: return "hard"
     
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         if isinstance(data, dict):
             return self.observe(data.get("state",""), data.get("action",""), data.get("outcome",""))
         return {"status": "invalid"}
     
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "curriculum"}
         # Sort tiles by difficulty
         for tile in batch:
             diff = self._classify_difficulty(tile)

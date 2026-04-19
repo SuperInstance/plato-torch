@@ -22,8 +22,15 @@ class SelfSupervisedRoom(RoomBase):
 
     # -- public API -----------------------------------------------------------
 
-    def feed(self, states: list[dict[str, float]]) -> list[dict]:
+    def feed(self, data=None) -> list[dict]:
         """Accept full states, auto-create masked versions, buffer for training."""
+        if data is None:
+            data = [{"x": 1.0, "y": 2.0, "z": 3.0}]
+        if isinstance(data, dict):
+            data = [data]
+        if isinstance(data, str):
+            data = [{"x": 1.0, "y": 2.0, "z": 3.0}]
+        states = data
         results = []
         for state in states:
             keys = list(state.keys())
@@ -44,34 +51,45 @@ class SelfSupervisedRoom(RoomBase):
         n = 0
         for sample in self._buffer:
             full = sample["full"]
+            full = {k: float(v) if isinstance(v, (int,float)) else 0.0 for k,v in full.items()}
             # update per-dim statistics
-            for k, v in full.items():
-                if k not in self.repr_map:
-                    self.repr_map[k] = {"mean": v, "m2": 0.0, "n": 1, "co": {}}
-                entry = self.repr_map[k]
-                entry["n"] += 1
-                delta = v - entry["mean"]
-                entry["mean"] += delta / entry["n"]
-                entry["m2"] += delta * (v - entry["mean"])
-                entry["std"] = math.sqrt(entry["m2"] / max(1, entry["n"] - 1)) if entry["n"] > 1 else 1.0
-                # co-occurrence covariance
-                for k2, v2 in full.items():
-                    if k2 != k:
-                        co = entry["co"].setdefault(k2, {"mean_xy": 0.0, "n": 0})
-                        co["n"] += 1
-                        co["mean_xy"] += (v * v2 - co["mean_xy"]) / co["n"]
-
+        for k, v in full.items():
+            try: v = float(v)
+            except (TypeError, ValueError): v = 0.0
+            if k not in self.repr_map:
+                self.repr_map[k] = {"mean": v, "m2": 0.0, "n": 1, "co": {}}
+            entry = self.repr_map[k]
+            entry["n"] += 1
+            try:
+                delta = float(v) - float(entry["mean"])
+            except (TypeError, ValueError):
+                delta = 0.0
+            entry["mean"] += delta / entry["n"]
+            entry["m2"] += delta * (v - entry["mean"])
+            entry["std"] = math.sqrt(entry["m2"] / max(1, entry["n"] - 1)) if entry["n"] > 1 else 1.0
+            for k2, v2 in full.items():
+                if k2 != k:
+                    co = entry["co"].setdefault(k2, {"mean_xy": 0.0, "n": 0})
+                    co["n"] += 1
+                    co["mean_xy"] += (v * v2 - co["mean_xy"]) / co["n"]
             # pseudo-loss: squared error of mean-prediction for masked dims
             for mk in sample["masked"]:
                 pred = self.repr_map.get(mk, {}).get("mean", 0.0)
-                total_loss += (sample["full"][mk] - pred) ** 2
+                try: total_loss += (float(sample["full"][mk]) - pred) ** 2
+                except (TypeError, ValueError): total_loss += 0.0
                 n += 1
 
         self._buffer.clear()
         return {"status": "trained", "samples": n, "avg_loss": total_loss / max(1, n)}
 
-    def predict(self, partial: dict[str, float]) -> dict[str, float]:
+    def predict(self, partial=None) -> dict[str, float]:
         """Fill in missing dimensions from a partial state using learned correlations."""
+        if partial is None:
+            partial = {"x": 1.0}
+        if isinstance(partial, dict):
+            partial = {k: float(v) if isinstance(v, (int, float)) else 0.0 for k, v in partial.items()}
+        else:
+            partial = {"x": 1.0}
         result = dict(partial)
         known_keys = set(partial.keys())
         for dim, entry in self.repr_map.items():

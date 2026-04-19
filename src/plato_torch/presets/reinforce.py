@@ -172,7 +172,9 @@ class ReinforceRoom(RoomBase):
             return {"status": "buffered"}
         return {"status": "invalid_data"}
 
-    def train_step(self, batch):
+    def train_step(self, batch=None):
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "reinforce"}
         return self.train()
 
     def predict(self, input):

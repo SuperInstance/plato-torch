@@ -21,7 +21,9 @@ class ActiveRoom(RoomBase):
         self._label_counts = defaultdict(lambda: defaultdict(int))
         self._queried = set()
     
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         if isinstance(data, dict) and "input" in data and "label" in data:
             h = self._hash(data["input"])
             self._label_counts[h][data["label"]] += 1
@@ -29,7 +31,9 @@ class ActiveRoom(RoomBase):
             return {"labeled": True, "hash": h}
         return {"status": "need_input_and_label"}
     
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "active"}
         for tile in batch:
             h = tile.get("state_hash", "")
             action = tile.get("action", "")

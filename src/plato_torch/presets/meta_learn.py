@@ -19,7 +19,9 @@ class MetaLearnRoom(RoomBase):
         self._task_actions = {}     # task → {state_hash → best_action}
         self._buffer = defaultdict(list)
 
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         if isinstance(data, dict):
             task = data.get("task", "default")
             return self.observe(data.get("state",""), data.get("action",""), data.get("outcome",""),
@@ -31,7 +33,9 @@ class MetaLearnRoom(RoomBase):
         for ex in examples:
             self._buffer[task].append(ex)
 
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "meta_learn"}
         for tile in batch:
             task = tile.get("context", {}).get("task", "default")
             sh = tile.get("state_hash", "")

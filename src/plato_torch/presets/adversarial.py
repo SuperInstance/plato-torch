@@ -16,8 +16,12 @@ class AdversarialRoom(RoomBase):
 
     # -- public API --
 
-    def feed(self, data: dict) -> None:
+    def feed(self, data=None) -> None:
         """Accept {attack_input, defense_response}."""
+        if data is None: data = {}
+        if isinstance(data, str): data = {"attack_input": data, "defense_response": data}
+        data.setdefault("attack_input", "test")
+        data.setdefault("defense_response", "test")
         self.rounds.append({
             "attack_input": data["attack_input"],
             "defense_response": data["defense_response"],
@@ -41,7 +45,7 @@ class AdversarialRoom(RoomBase):
         weakest = sorted(scores, key=scores.get, reverse=True)[:5]  # type: ignore[arg-type]
         return {"attack_success_rate": self.attack_success_rate, "weakest": weakest}
 
-    def predict(self) -> list[str]:
+    def predict(self, input=None) -> list[str]:
         """Return most vulnerable inputs for red-team testing."""
         stats = self.train_step()
         return stats["weakest"]

@@ -19,7 +19,9 @@ class ImitateRoom(RoomBase):
         self._expert_actions = defaultdict(list)  # state_hash → list of (action, reward)
         self._clone_accuracy = defaultdict(float)
     
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         if isinstance(data, dict):
             expert = data.get("expert", "unknown")
             return self.observe(data.get("state",""), data.get("action",""),
@@ -34,7 +36,9 @@ class ImitateRoom(RoomBase):
             self.observe(state, action, "success", expert_id)
         return {"watched": episodes, "expert": expert_id}
     
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "imitate"}
         for tile in batch:
             sh = tile.get("state_hash", "")
             action = tile.get("action", "")

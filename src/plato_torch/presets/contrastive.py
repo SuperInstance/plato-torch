@@ -19,8 +19,16 @@ class ContrastiveRoom(RoomBase):
         self._triplets: list[dict] = []
 
     # ------------------------------------------------------------------
-    def feed(self, data: dict):
+    def feed(self, data=None):
         """Accept {anchor, positive, negative} dicts. Each value is a feature dict."""
+        if data is None:
+            data = {"anchor": {"id": "a", "features": {"x": 1.0}},
+                    "positive": {"id": "b", "features": {"x": 0.9}},
+                    "negative": {"id": "c", "features": {"x": 0.1}}}
+        if isinstance(data, str):
+            data = {"anchor": {"id": data, "features": {"x": 1.0}},
+                    "positive": {"id": data+"p", "features": {"x": 0.9}},
+                    "negative": {"id": data+"n", "features": {"x": 0.1}}}
         self._triplets.append(data)
         for role in ("anchor", "positive", "negative"):
             item = data.get(role)
@@ -60,8 +68,13 @@ class ContrastiveRoom(RoomBase):
         return {"accuracy": margin_hits / total, "pairs": len(ids) * (len(ids) - 1) // 2}
 
     # ------------------------------------------------------------------
-    def predict(self, query_id: str, top_k: int = 5) -> list[dict]:
+    def predict(self, query_id=None, top_k: int = 5) -> list[dict]:
         """Return nearest neighbors with similarity scores."""
+        if query_id is None:
+            ids = list(self.sim_matrix)
+            query_id = ids[0] if ids else ''
+        if isinstance(query_id, dict):
+            query_id = str(query_id)
         row = self.sim_matrix.get(query_id, {})
         ranked = sorted(row.items(), key=lambda x: x[1], reverse=True)[:top_k]
         return [{"id": nid, "score": round(s, 6)} for nid, s in ranked]

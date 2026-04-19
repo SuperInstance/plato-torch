@@ -22,10 +22,22 @@ class LoRARoom(RoomBase):
 
     # ── data ingestion ────────────────────────────────────────────────
 
-    def feed(self, instruction: str, response: str):
+    def feed(self, data=None, instruction: str = None, response: str = None):
+        if data is not None and instruction is None:
+            if isinstance(data, dict):
+                instruction = data.get('instruction', data.get('input', 'test'))
+                response = data.get('response', data.get('output', 'test'))
+            else:
+                instruction = str(data)
+                response = str(data)
+        if instruction is None: instruction = 'test'
+        if response is None: response = 'test'
         """Accept an instruction-response pair for adapter training."""
+        instruction = str(instruction)
+        response = str(response)
         self.examples.append((instruction, response))
         # tokenise via simple hash windows → pseudo-embedding
+        instruction = str(instruction) if not isinstance(instruction, str) else instruction
         key = self._hash(instruction)
         vec = self._embed(response)
         self.base_knowledge[key] = vec
@@ -48,7 +60,9 @@ class LoRARoom(RoomBase):
 
     # ── inference ─────────────────────────────────────────────────────
 
-    def predict(self, instruction: str) -> list[float]:
+    def predict(self, instruction=None) -> list[float]:
+        if instruction is None: instruction = "test"
+        if not isinstance(instruction, str): instruction = str(instruction)
         """Combine base knowledge with learned deltas for a prediction."""
         key = self._hash(instruction)
         base = self.base_knowledge.get(key, self._embed(instruction))

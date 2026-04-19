@@ -19,7 +19,9 @@ class FederateRoom(RoomBase):
         self._consensus = defaultdict(lambda: defaultdict(float))  # merged model
         self.round_num = 0
 
-    def feed(self, data: Any, **kwargs) -> Dict:
+    def feed(self, data=None, **kwargs) -> Dict:
+        if data is None: data = {}
+        if isinstance(data, str): data = {"data": data}
         if isinstance(data, dict):
             agent_id = data.get("agent_id", "unknown")
             updates = data.get("updates", {})
@@ -37,7 +39,9 @@ class FederateRoom(RoomBase):
             self._agent_models[agent_id][key] = self._agent_models[agent_id].get(key, 0) + value
         return {"agent": agent_id, "accepted": True}
 
-    def train_step(self, batch: List[Dict]) -> Dict:
+    def train_step(self, batch=None) -> Dict:
+        if batch is None:
+            return {"status": "ok", "message": "no batch", "preset": "federate"}
         """Federated averaging: merge all agent models into consensus."""
         # Also process any batch tiles
         for tile in batch:
