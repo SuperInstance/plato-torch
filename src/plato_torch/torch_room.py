@@ -35,9 +35,9 @@ except ImportError:
     from room_base import RoomBase
 
 try:
-    from .room_presets import PRESETS, get_preset, TrainingPreset
+    from .room_presets import PRESET_REGISTRY as PRESETS, get_preset, TrainingPreset
 except ImportError:
-    from room_presets import PRESETS, get_preset, TrainingPreset
+    from room_presets import PRESET_REGISTRY as PRESETS, get_preset, TrainingPreset
 
 
 class TorchRoom(RoomBase):
@@ -72,13 +72,15 @@ class TorchRoom(RoomBase):
                  preset: str = None):
         # Load preset config if specified
         self.preset_name = preset
-        self._preset_config: Optional[TrainingPreset] = None
+        self._preset_config = None
         if preset is not None:
-            self._preset_config = get_preset(preset)
-            if self._preset_config is None:
+            preset_cls = get_preset(preset)
+            if preset_cls is None:
                 raise ValueError(f"Unknown preset: {preset}. Available: {list(PRESETS.keys())}")
-            # Override use_case from preset if not explicitly set
-            if use_case == "general" and self._preset_config.training_paradigm:
+            self._preset_config = preset_cls(room_id, ensign_dir=ensign_dir, buffer_dir=buffer_dir) if isinstance(preset_cls, type) else preset_cls
+            # Override use_case from preset if available
+            training_paradigm = getattr(self._preset_config, 'training_paradigm', None) or getattr(self._preset_config, 'use_case', None)
+            if use_case == "general" and training_paradigm:
                 use_case = self._preset_config.training_paradigm
 
         self.room_id = room_id
@@ -107,10 +109,10 @@ class TorchRoom(RoomBase):
         self._train_count = 0
 
         # Sentiment + live stream + incremental trainer
-        self.sentiment = RoomSentiment()
-        self.biased_random = BiasedRandomness(self.sentiment)
+        self._sentiment = RoomSentiment()
+        self._biased_random = BiasedRandomness(self._sentiment)
         self.incremental_trainer = IncrementalTrainer(room_id)
-        self.live_stream = LiveTileStream(room_id, self.sentiment, self.incremental_trainer)
+        self.live_stream = LiveTileStream(room_id, self._sentiment, self.incremental_trainer)
 
         # Load existing state
         self._load_state()
@@ -150,6 +152,24 @@ class TorchRoom(RoomBase):
     def predict(self, state: str, **kwargs) -> Dict:
         """Predict for a given state. Default delegates to instinct()."""
         return self.instinct(state)
+
+    def train_step(self, batch: list) -> dict:
+        """One training step on a batch. Delegates to train()."""
+        for item in batch:
+            state = item.get("state", "")
+            action = item.get("action", "")
+            outcome = item.get("outcome", "")
+            reward = item.get("reward", self._infer_reward(state, action, outcome))
+            agent_id = item.get("agent_id", "unknown")
+            self.observe(state, action, outcome, agent_id, reward=reward)
+        return self.train()
+
+    def export_model(self, format: str = "json") -> bytes:
+        """Export the trained model in the specified format."""
+        model = self._load_model()
+        if model is None:
+            return b"{}"
+        return json.dumps(model, indent=2).encode("utf-8")
 
     def export(self, format: str = "json", path: str = None, **kwargs) -> str:
         """Export trained model. Default: copy the room model to specified path."""

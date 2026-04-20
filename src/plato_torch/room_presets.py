@@ -1,5 +1,17 @@
 """PLATO Room Preset Registry — 21 training methods, same API."""
 
+from typing import Any, Dict, List, Optional
+
+
+class TrainingPreset:
+    """Descriptor for a training room preset."""
+    def __init__(self, name: str, training_paradigm: str = "general", **kwargs):
+        self.name = name
+        self.training_paradigm = training_paradigm
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+
 PRESET_REGISTRY = {
     # Classic ML
     "supervised":       {"class": "SupervisedRoom",       "file": "supervised.py",

@@ -34,7 +34,7 @@ class ServerRoom:
                 self.tiles = data.get("tiles", [])
             else:
                 self.tiles = []
-        except:
+        except (urllib.error.URLError, json.JSONDecodeError, OSError):
             self.tiles = []
     
     def feed(self, data: Dict[str, Any]):

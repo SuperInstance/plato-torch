@@ -8,8 +8,8 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from torch_room import TorchRoom
-from tile_grabber import TileGrabber
+from plato_torch.torch_room import TorchRoom
+from plato_torch.tile_grabber import TileGrabber
 
 
 def test_room_observe():
